@@ -7,8 +7,14 @@ library(Hmisc)
 rekURL="http://rekognition.com/func/api/?api_key=Rcl2sf7etxRQSP99&api_secret=CviqfsiQ7AgjgaCb&jobs=face_gender_part_age_race_beard&urls="
   
 shinyServer(function(input, output) {
-facedata <- reactive({
-  
+  faceDatadf <- reactive({
+  if (input$url==""){
+    
+    facedatadf=df <- data.frame(matrix(ncol = 6, nrow = 1))
+    names(facedatadf)=c("Gender", "Beard", "Age", "Race", "noseX", "noseY")
+    return(facedatadf)
+  }
+    
   fullURL=paste(rekURL, input$url, sep="")
   faceData=getURL(fullURL)
   
@@ -49,10 +55,19 @@ facedata <- reactive({
   
   #Create Dataframe
 
-  faceDatadf= data.frame(Gender, Beard, Age, Race, noseX, noseY)
-}
+  faceDatadf= data.frame(Gender, Beard, Age, Race, noseX, noseY)}
+
 )
 
-output$test <- renderDataTable(faceDatadf())
+output$myImage <- renderUI({
+  if (input$url==""){return()}
+  images <- input$url
+  tags$img(src= images, width=150, height=120)
+  
+})
+
+output$test <- renderTable({
+    faceDatadf()
+})
 })
 
